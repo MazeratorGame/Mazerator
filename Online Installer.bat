@@ -8,7 +8,7 @@ if [%version%]==[] goto 20200502
 if %version%==20200321 goto 20200502
 
 :20200502
-curl "https://gitlab.com/api/v4/projects/18898692/repository/files/oinstall/20200502.bat/raw?ref=master" --output "20200502.bat"
+curl "https://gitlab.com/api/v4/projects/18898692/repository/files/oinstall%2f20200502.bat/raw?ref=master" --output "20200502.bat"
 cls
 cmd /c "20200502.bat"
 del "20200502.bat"
