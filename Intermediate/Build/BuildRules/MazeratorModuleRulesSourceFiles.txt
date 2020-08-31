@@ -1,2 +1,0 @@
-C:\Users\Kalin\Documents\GitHub\Mazerator\Intermediate\Source\Mazerator.Build.cs
-C:\Users\Kalin\Documents\GitHub\Mazerator\Intermediate\Source\Mazerator.Target.cs

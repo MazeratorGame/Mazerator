@@ -1,3 +1,0 @@
-C:\Users\Kalin\Documents\GitHub\Mazerator\Saved\Cooked\WindowsNoEditor\Mazerator\Content\FirstPersonBP\Blueprints\FirstPersonCharacter
-C:\Users\Kalin\Documents\GitHub\Mazerator\Saved\Cooked\WindowsNoEditor\Mazerator\Content\FirstPersonBP\Blueprints\FirstPersonGameMode
-C:\Users\Kalin\Documents\GitHub\Mazerator\Saved\Cooked\WindowsNoEditor\Mazerator\Content\FirstPersonBP\Blueprints\FirstPersonHUD
