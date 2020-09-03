@@ -28,7 +28,7 @@ jobs:
           name: Export win64 build
           command: |
               mkdir -p win64
-              ./godot --export win64 Project/project.godot "win64/Mazerator.exe"
+              ./godot --export win64 ./Project/project.godot "./win64/Mazerator.exe"
       - run:
           name: Export linux64 build
           command: |
