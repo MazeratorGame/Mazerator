@@ -1,0 +1,52 @@
+version: 2
+jobs:
+  build:
+    machine:
+        enabled: true
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+              sudo apt-get update
+              sudo apt-get -y install wget zip unzip
+      - run:
+          name: Download Godot 3.2.2
+          command: |
+              wget -q https://downloads.tuxfamily.org/godotengine/3.2.2/Godot_v3.2.2-stable_linux_headless.64.zip
+              unzip Godot_v3.2.2-stable_linux_headless.64.zip
+              mv Godot_v3.2.2-stable_linux_headless.64 godot
+              chmod +x godot
+      - run:
+          name: Download Godot 3.2.2 Export Templates
+          command: |
+              wget -q https://downloads.tuxfamily.org/godotengine/3.2.2/Godot_v3.2.2-stable_export_templates.tpz
+              mkdir -p ~/.local/share/godot/templates
+              unzip Godot_v3.2.2-stable_export_templates.tpz -d ~/.local/share/godot/templates
+              mv ~/.local/share/godot/templates/templates ~/.local/share/godot/templates/3.2.2.stable
+      - run:
+          name: Export win64 build
+          command: |
+              mkdir -p win64
+              ./godot --export win64 Project/project.godot "win64/Mazerator.exe"
+      - run:
+          name: Export linux64 build
+          command: |
+              mkdir -p linux64
+              ./godot --export linux64 Project/project.godot "linux64/Mazerator"
+
+      - run:
+          name: Export mac build
+          command: |
+              ./godot --export macos Project/project.godot "Mazerator-mac"
+              mv Mazerator-mac Mazerator-mac.zip
+      - run:
+          name: Export win32 build
+          command: |
+              mkdir -p win32
+              ./godot --export win32 Project/project.godot "win32/Mazerator.exe"
+      - run:
+          name: Export linux32 build
+          command: |
+              mkdir -p linux32
+              ./godot --export linux32 Project/project.godot "linux32/Mazerator"
