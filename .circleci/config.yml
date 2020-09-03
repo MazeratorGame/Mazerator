@@ -56,21 +56,21 @@ jobs:
               zip linux32.zip linux32/*
               
       - store_artifacts:
-        path: win64.zip
-        destination: win64.zip
+           path: win64.zip
+           destination: win64.zip
         
       - store_artifacts:
-        path: win32.zip
-        destination: win32.zip
+           path: win32.zip
+           destination: win32.zip
         
       - store_artifacts:
-        path: linux64.zip
-        destination: linux64.zip
+           path: linux64.zip
+           destination: linux64.zip
         
       - store_artifacts:
-        path: linux32.zip
-        destination: linux32.zip
+           path: linux32.zip
+           destination: linux32.zip
         
       - store_artifacts:
-        path: Mazerator-mac.zip
-        destination: Mazerator-mac.zip
+           path: Mazerator-mac.zip
+           destination: Mazerator-mac.zip
