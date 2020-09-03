@@ -32,21 +32,21 @@ jobs:
       - run:
           name: Export linux64 build
           command: |
-              mkdir -p linux64
-              ./godot --export linux64 Project/project.godot "linux64/Mazerator"
+              mkdir linux64
+              ./godot --export linux64 --path Project/project.godot "linux64/Mazerator"
 
       - run:
           name: Export mac build
           command: |
-              ./godot --export macos Project/project.godot "Mazerator-mac"
+              ./godot --export macos --path Project/project.godot "Mazerator-mac"
               mv Mazerator-mac Mazerator-mac.zip
       - run:
           name: Export win32 build
           command: |
-              mkdir -p win32
-              ./godot --export win32 Project/project.godot "win32/Mazerator.exe"
+              mkdir win32
+              ./godot --export win32 --path Project/project.godot "win32/Mazerator.exe"
       - run:
           name: Export linux32 build
           command: |
-              mkdir -p linux32
-              ./godot --export linux32 Project/project.godot "linux32/Mazerator"
+              mkdir linux32
+              ./godot --export linux32 --path Project/project.godot "linux32/Mazerator"
