@@ -4,3 +4,6 @@ Please note that nightly builds aren't nightly. These are actually builds that I
 Don't believe what is says about what it's programmed with.
 
 If you want to install old versions of Mazerator, goto github.com/Awesome-Arcade/Mazerator-old/releases
+
+# Why I switch to Godot
+One reason: Quicker (There are actually more)
