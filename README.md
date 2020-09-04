@@ -7,3 +7,6 @@ If you want to install old versions of Mazerator, goto github.com/Awesome-Arcade
 
 # Why I switch to Godot
 One reason: Quicker (There are actually more)
+
+# How to build
+Open Godot 3.2.2 (must be this!) then open this project and then goto Project > Export and if you don't have the export templates, download them and then select your platform or what platform you want to build to. Then press Export Project. It may ask you where to export.
