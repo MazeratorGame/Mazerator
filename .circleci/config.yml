@@ -9,7 +9,7 @@ jobs:
           name: Install dependencies
           command: |
               sudo apt-get update
-              sudo apt-get -y install wget zip unzip
+              sudo apt-get -y install wget zip unzip bzip2
       - run:
           name: Download Godot 3.2.2
           command: |
@@ -54,6 +54,26 @@ jobs:
               mkdir linux32
               ./godot --export linux32 --path project.godot "linux32/Mazerator"
               zip linux32.zip linux32/*
+      - run:
+          name: Upload to GitHub
+          command: |
+              wget https://github.com/github-release/github-release/releases/download/v0.8.1/linux-amd64-github-release.bz2
+              bzip2 -d linux-amd64-github-release.bz2
+              cd linux-amd64-github-release
+              export GITHUB_TOKEN=${GITHUB_TOKEN}
+              github-release release \
+                --user MazeratorBot \
+                --repo ${CIRCLE_PROJECT_REPONAME} \
+                --tag ${CIRCLE_SHA1} \
+                --name ${CIRCLE_SHA1} \
+                --description "An automated upload from our CI" \
+                --pre-release
+              github-release upload \
+                --user MazeratorBot \
+                --repo ${CIRCLE_PROJECT_REPONAME} \
+                --tag ${CIRCLE_SHA1} \
+                --name ${CIRCLE_SHA1} \
+                --file ../github/.                
               
       - store_artifacts:
            path: win64.zip
