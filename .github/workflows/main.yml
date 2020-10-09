@@ -29,10 +29,9 @@ jobs:
         godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/3.2.2/Godot_v3.2.2-stable_export_templates.tpz
         relative_project_path: ./
         generate_release_notes: true
-    - name: upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-            name: mazerator
-            path: /home/runner/.local/share/godot/dist/
+    -  uses: actions/upload-artifact@v2
+       with:
+        name: mazerator
+        path: /home/runner/.local/share/godot/dist/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
