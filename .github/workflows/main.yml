@@ -33,5 +33,5 @@ jobs:
        with:
         name: mazerator
         path: /home/runner/.local/share/godot/dist/
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
