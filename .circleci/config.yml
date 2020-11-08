@@ -30,12 +30,12 @@ jobs:
               mkdir win64
               ./godot --path project.godot --export win64 "win64/Mazerator.exe"
               zip win64.zip win64/*
-      - run:
-          name: Export linux64 build
-          command: |
-              mkdir linux64
-              ./godot --export linux64 --path project.godot "linux64/Mazerator"
-              zip linux64.zip linux64/*
+      # - run:
+          # name: Export linux64 build
+          # command: |
+              # mkdir linux64
+              # ./godot --export linux64 --path project.godot "linux64/Mazerator"
+              # zip linux64.zip linux64/*
 
       - run:
           name: Export mac build
@@ -48,12 +48,12 @@ jobs:
               mkdir win32
               ./godot --export win32 --path project.godot "win32/Mazerator.exe"
               zip win32.zip win32/*
-      - run:
-          name: Export linux32 build
-          command: |
-              mkdir linux32
-              ./godot --export linux32 --path project.godot "linux32/Mazerator"
-              zip linux32.zip linux32/*            
+      # - run:
+          # name: Export linux32 build
+          # command: |
+              # mkdir linux32
+              # ./godot --export linux32 --path project.godot "linux32/Mazerator"
+              # zip linux32.zip linux32/*            
               
       - store_artifacts:
            path: win64.zip
@@ -63,13 +63,13 @@ jobs:
            path: win32.zip
            destination: win32.zip
         
-      - store_artifacts:
-           path: linux64.zip
-           destination: linux64.zip
+      # - store_artifacts:
+           # path: linux64.zip
+           # destination: linux64.zip
         
-      - store_artifacts:
-           path: linux32.zip
-           destination: linux32.zip
+      # - store_artifacts:
+           # path: linux32.zip
+           # destination: linux32.zip
         
       - store_artifacts:
            path: Mazerator-mac.zip
