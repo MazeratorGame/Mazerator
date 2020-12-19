@@ -4,7 +4,9 @@ shader_type spatial;
 
 uniform sampler2D u_terrain_heightmap;
 uniform sampler2D u_terrain_normalmap;
-uniform sampler2D u_terrain_colormap : hint_albedo;
+// I had to remove `hint_albedo` from colormap because it makes sRGB conversion kick in,
+// which snowballs to black when doing GPU painting on that texture...
+uniform sampler2D u_terrain_colormap;// : hint_albedo;
 uniform mat4 u_terrain_inverse_transform;
 uniform mat3 u_terrain_normal_basis;
 
@@ -12,7 +14,11 @@ varying flat vec4 v_tint;
 
 
 vec3 unpack_normal(vec4 rgba) {
-	return rgba.xzy * 2.0 - vec3(1.0);
+	vec3 n = rgba.xzy * 2.0 - vec3(1.0);
+	// Had to negate Z because it comes from Y in the normal map,
+	// and OpenGL-style normal maps are Y-up.
+	n.z *= -1.0;
+	return n;
 }
 
 void vertex() {
@@ -35,8 +41,7 @@ void vertex() {
 	v_tint = texture(u_terrain_colormap, UV);
 	
 	// Need to use u_terrain_normal_basis to handle scaling.
-	// For some reason I also had to invert Z when sampling terrain normals... not sure why
-	NORMAL = u_terrain_normal_basis * (unpack_normal(texture(u_terrain_normalmap, UV)) * vec3(1,1,-1));
+	NORMAL = u_terrain_normal_basis * unpack_normal(texture(u_terrain_normalmap, UV));
 }
 
 void fragment() {
@@ -45,7 +50,8 @@ void fragment() {
 		discard;
 	}
 	
-	vec3 terrain_normal_world = u_terrain_normal_basis * (unpack_normal(texture(u_terrain_normalmap, UV)) * vec3(1,1,-1));
+	vec3 terrain_normal_world = 
+		u_terrain_normal_basis * unpack_normal(texture(u_terrain_normalmap, UV));
 	terrain_normal_world = normalize(terrain_normal_world);
 	
 	ALBEDO = v_tint.rgb;

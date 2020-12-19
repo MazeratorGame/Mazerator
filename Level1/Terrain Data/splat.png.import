@@ -2,19 +2,33 @@
 
 importer="texture"
 type="StreamTexture"
+path="res://.import/splat.png-efc2493197ff76da519be2638b2adc79.stex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://Level1/Terrain Data/splat.png"
+dest_files=[ "res://.import/splat.png-efc2493197ff76da519be2638b2adc79.stex" ]
 
 [params]
 
 compress/mode=0
+compress/lossy_quality=0.7
 compress/hdr_mode=0
+compress/bptc_ldr=0
 compress/normal_map=0
-flags/mipmaps=false
+flags/repeat=0
 flags/filter=true
+flags/mipmaps=false
+flags/anisotropic=false
 flags/srgb=0
 process/fix_alpha_border=false
+process/premult_alpha=false
+process/HDR_as_SRGB=false
+process/invert_color=false
+stream=false
+size_limit=0
 detect_3d=false
-
+svg/scale=1.0

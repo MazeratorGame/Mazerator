@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/height_map.png-d62b9041fc8c34d62e9236527ca5226d.stex"
+path="res://.import/icon_heightmap_erode.svg-fad285f0810d69bec16027ac0257c223.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/zylann.hterrain/tools/icons/height_map.png"
-dest_files=[ "res://.import/height_map.png-d62b9041fc8c34d62e9236527ca5226d.stex" ]
+source_file="res://addons/zylann.hterrain/tools/icons/icon_heightmap_erode.svg"
+dest_files=[ "res://.import/icon_heightmap_erode.svg-fad285f0810d69bec16027ac0257c223.stex" ]
 
 [params]
 

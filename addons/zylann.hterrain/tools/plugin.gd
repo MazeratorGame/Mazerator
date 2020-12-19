@@ -1,13 +1,16 @@
-tool
-extends EditorPlugin
+tool # https://www.youtube.com/watch?v=Y7JG63IuaWs
 
+extends EditorPlugin
 
 const HTerrain = preload("../hterrain.gd")
 const HTerrainDetailLayer = preload("../hterrain_detail_layer.gd")
 const HTerrainData = preload("../hterrain_data.gd")
 const HTerrainMesher = preload("../hterrain_mesher.gd")
+const HTerrainTextureSet = preload("../hterrain_texture_set.gd")
+const PackedTextureImporter = preload("./packed_textures/packed_texture_importer.gd")
+const PackedTextureArrayImporter = preload("./packed_textures/packed_texture_array_importer.gd")
 const PreviewGenerator = preload("./preview_generator.gd")
-const Brush = preload("../hterrain_brush.gd")
+const Brush = preload("./brush/terrain_painter.gd")
 const BrushDecal = preload("./brush/decal.gd")
 const Util = preload("../util/util.gd")
 const EditorUtil = preload("./util/editor_util.gd")
@@ -24,6 +27,11 @@ const ImportDialog = preload("./importer/importer_dialog.tscn")
 const GenerateMeshDialog = preload("./generate_mesh_dialog.tscn")
 const ResizeDialog = preload("./resize_dialog/resize_dialog.tscn")
 const ExportImageDialog = preload("./exporter/export_image_dialog.tscn")
+const TextureSetEditor = preload("./texture_editor/set_editor/texture_set_editor.tscn")
+const TextureSetImportEditor = preload("./texture_editor/set_editor/texture_set_import_editor.tscn")
+const AboutDialogScene = preload("./about/about_dialog.tscn")
+
+const DOCUMENTATION_URL = "https://hterrain-plugin.readthedocs.io/en/latest"
 
 const MENU_IMPORT_MAPS = 0
 const MENU_GENERATE = 1
@@ -32,32 +40,45 @@ const MENU_RESIZE = 3
 const MENU_UPDATE_EDITOR_COLLIDER = 4
 const MENU_GENERATE_MESH = 5
 const MENU_EXPORT_HEIGHTMAP = 6
+const MENU_LOOKDEV = 7
+const MENU_DOCUMENTATION = 8
+const MENU_ABOUT = 9
 
 
 # TODO Rename _terrain
 var _node : HTerrain = null
 
+# GUI
 var _panel = null
 var _toolbar = null
 var _toolbar_brush_buttons = {}
 var _generator_dialog = null
+# TODO Rename _import_terrain_dialog
 var _import_dialog = null
 var _export_image_dialog = null
 var _progress_window = null
-var _load_texture_dialog = null
 var _generate_mesh_dialog = null
 var _preview_generator = null
 var _resize_dialog = null
-var _globalmap_baker = null
+var _about_dialog = null
 var _menu_button : MenuButton
+var _lookdev_menu : PopupMenu
+var _texture_set_editor = null
+var _texture_set_import_editor = null
+
+var _globalmap_baker = null
 var _terrain_had_data_previous_frame = false
 var _image_cache : ImageFileCache
+
+# Import
+var _packed_texture_importer := PackedTextureImporter.new()
+var _packed_texture_array_importer := PackedTextureArrayImporter.new()
 
 var _brush : Brush = null
 var _brush_decal : BrushDecal = null
 var _mouse_pressed := false
-var _pending_paint_action = null
-var _pending_paint_completed := false
+#var _pending_paint_action = null
+var _pending_paint_commit := false
 
 var _logger = Logger.get_for(self)
 
@@ -76,23 +97,27 @@ func _enter_tree():
 	add_custom_type("HTerrainDetailLayer", "Spatial", HTerrainDetailLayer, 
 		get_icon("detail_layer_node"))
 	add_custom_type("HTerrainData", "Resource", HTerrainData, get_icon("heightmap_data"))
+	# TODO Proper texture
+	add_custom_type("HTerrainTextureSet", "Resource", HTerrainTextureSet, null)
+	
+	add_import_plugin(_packed_texture_importer)
+	add_import_plugin(_packed_texture_array_importer)
 	
 	_preview_generator = PreviewGenerator.new()
 	get_editor_interface().get_resource_previewer().add_preview_generator(_preview_generator)
 	
 	_brush = Brush.new()
-	_brush.set_radius(5)
+	_brush.set_brush_size(5)
+	_brush.connect("changed", self, "_on_brush_changed")
+	add_child(_brush)
 
 	_brush_decal = BrushDecal.new()
-	_brush_decal.set_shape(_brush.get_shape())
-	_brush.connect("shape_changed", _brush_decal, "set_shape")
+	_brush_decal.set_size(_brush.get_brush_size())
 	
-	_image_cache = ImageFileCache.new("user://hterrain_image_cache")
+	_image_cache = ImageFileCache.new("user://temp_hterrain_image_cache")
 	
 	var editor_interface := get_editor_interface()
 	var base_control := editor_interface.get_base_control()
-	_load_texture_dialog = LoadTextureDialog.new()
-	base_control.add_child(_load_texture_dialog)
 	
 	_panel = EditPanel.instance()
 	Util.apply_dpi_scale(_panel, dpi_scale)
@@ -100,11 +125,14 @@ func _enter_tree():
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_BOTTOM, _panel)
 	# Apparently _ready() still isn't called at this point...
 	_panel.call_deferred("set_brush", _brush)
-	_panel.call_deferred("set_load_texture_dialog", _load_texture_dialog)
 	_panel.call_deferred("setup_dialogs", base_control)
+	_panel.set_undo_redo(get_undo_redo())
+	_panel.set_image_cache(_image_cache)
 	_panel.connect("detail_selected", self, "_on_detail_selected")
 	_panel.connect("texture_selected", self, "_on_texture_selected")
 	_panel.connect("detail_list_changed", self, "_update_brush_buttons_availability")
+	_panel.connect("edit_texture_pressed", self, "_on_Panel_edit_texture_pressed")
+	_panel.connect("import_textures_pressed", self, "_on_Panel_import_textures_pressed")
 	
 	_toolbar = HBoxContainer.new()
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _toolbar)
@@ -122,13 +150,23 @@ func _enter_tree():
 	menu.get_popup().add_item("Generate mesh (heavy)", MENU_GENERATE_MESH)
 	menu.get_popup().add_separator()
 	menu.get_popup().add_item("Export heightmap", MENU_EXPORT_HEIGHTMAP)
+	menu.get_popup().add_separator()
+	_lookdev_menu = PopupMenu.new()
+	_lookdev_menu.name = "LookdevMenu"
+	_lookdev_menu.connect("about_to_show", self, "_on_lookdev_menu_about_to_show")
+	_lookdev_menu.connect("id_pressed", self, "_on_lookdev_menu_id_pressed")
+	menu.get_popup().add_child(_lookdev_menu)
+	menu.get_popup().add_submenu_item("Lookdev", _lookdev_menu.name, MENU_LOOKDEV)
 	menu.get_popup().connect("id_pressed", self, "_menu_item_selected")
+	menu.get_popup().add_separator()
+	menu.get_popup().add_item("Documentation", MENU_DOCUMENTATION)
+	menu.get_popup().add_item("About HTerrain...", MENU_ABOUT)
 	_toolbar.add_child(menu)
 	_menu_button = menu
 	
 	var mode_icons := {}
-	mode_icons[Brush.MODE_ADD] = get_icon("heightmap_raise")
-	mode_icons[Brush.MODE_SUBTRACT] = get_icon("heightmap_lower")
+	mode_icons[Brush.MODE_RAISE] = get_icon("heightmap_raise")
+	mode_icons[Brush.MODE_LOWER] = get_icon("heightmap_lower")
 	mode_icons[Brush.MODE_SMOOTH] = get_icon("heightmap_smooth")
 	mode_icons[Brush.MODE_FLATTEN] = get_icon("heightmap_flatten")
 	# TODO Have different icons
@@ -137,10 +175,11 @@ func _enter_tree():
 	mode_icons[Brush.MODE_DETAIL] = get_icon("grass")
 	mode_icons[Brush.MODE_MASK] = get_icon("heightmap_mask")
 	mode_icons[Brush.MODE_LEVEL] = get_icon("heightmap_level")
+	mode_icons[Brush.MODE_ERODE] = get_icon("heightmap_erode")
 	
 	var mode_tooltips := {}
-	mode_tooltips[Brush.MODE_ADD] = "Raise height"
-	mode_tooltips[Brush.MODE_SUBTRACT] = "Lower height"
+	mode_tooltips[Brush.MODE_RAISE] = "Raise height"
+	mode_tooltips[Brush.MODE_LOWER] = "Lower height"
 	mode_tooltips[Brush.MODE_SMOOTH] = "Smooth height"
 	mode_tooltips[Brush.MODE_FLATTEN] = "Flatten (flatten to a specific height)"
 	mode_tooltips[Brush.MODE_SPLAT] = "Texture paint"
@@ -148,16 +187,18 @@ func _enter_tree():
 	mode_tooltips[Brush.MODE_DETAIL] = "Grass paint"
 	mode_tooltips[Brush.MODE_MASK] = "Cut holes"
 	mode_tooltips[Brush.MODE_LEVEL] = "Level (smoothly flattens to average)"
+	mode_tooltips[Brush.MODE_ERODE] = "Erode"
 	
 	_toolbar.add_child(VSeparator.new())
 	
 	# I want modes to be in that order in the GUI
 	var ordered_brush_modes := [
-		Brush.MODE_ADD,
-		Brush.MODE_SUBTRACT,
+		Brush.MODE_RAISE,
+		Brush.MODE_LOWER,
 		Brush.MODE_SMOOTH,
 		Brush.MODE_LEVEL,
 		Brush.MODE_FLATTEN,
+		Brush.MODE_ERODE,
 		Brush.MODE_SPLAT,
 		Brush.MODE_COLOR,
 		Brush.MODE_DETAIL,
@@ -197,7 +238,8 @@ func _enter_tree():
 	base_control.add_child(_progress_window)
 	
 	_generate_mesh_dialog = GenerateMeshDialog.instance()
-	_generate_mesh_dialog.connect("generate_selected", self, "_on_GenerateMeshDialog_generate_selected")
+	_generate_mesh_dialog.connect(
+		"generate_selected", self, "_on_GenerateMeshDialog_generate_selected")
 	Util.apply_dpi_scale(_generate_mesh_dialog, dpi_scale)
 	base_control.add_child(_generate_mesh_dialog)
 	
@@ -217,7 +259,27 @@ func _enter_tree():
 	# Need to call deferred because in the specific case where you start the editor
 	# with the plugin enabled, _ready won't be called at this point
 	_export_image_dialog.call_deferred("setup_dialogs", base_control)
+	
+	_about_dialog = AboutDialogScene.instance()
+	Util.apply_dpi_scale(_about_dialog, dpi_scale)
+	base_control.add_child(_about_dialog)
 
+	_texture_set_editor = TextureSetEditor.instance()
+	_texture_set_editor.set_undo_redo(get_undo_redo())
+	Util.apply_dpi_scale(_texture_set_editor, dpi_scale)
+	base_control.add_child(_texture_set_editor)
+	_texture_set_editor.call_deferred("setup_dialogs", base_control)
+
+	_texture_set_import_editor = TextureSetImportEditor.instance()
+	_texture_set_import_editor.set_undo_redo(get_undo_redo())
+	_texture_set_import_editor.set_editor_file_system(
+		get_editor_interface().get_resource_filesystem())
+	Util.apply_dpi_scale(_texture_set_import_editor, dpi_scale)
+	base_control.add_child(_texture_set_import_editor)
+	_texture_set_import_editor.call_deferred("setup_dialogs", base_control)
+
+	_texture_set_editor.connect("import_selected", self, "_on_TextureSetEditor_import_selected")
+	
 
 func _exit_tree():
 	_logger.debug("HTerrain plugin Exit tree")
@@ -230,9 +292,6 @@ func _exit_tree():
 	
 	_toolbar.queue_free()
 	_toolbar = null
-	
-	_load_texture_dialog.queue_free()
-	_load_texture_dialog = null
 	
 	_generator_dialog.queue_free()
 	_generator_dialog = null
@@ -251,6 +310,15 @@ func _exit_tree():
 	
 	_export_image_dialog.queue_free()
 	_export_image_dialog = null
+	
+	_about_dialog.queue_free()
+	_about_dialog = null
+
+	_texture_set_editor.queue_free()
+	_texture_set_editor = null
+
+	_texture_set_import_editor.queue_free()
+	_texture_set_import_editor = null
 
 	get_editor_interface().get_resource_previewer().remove_preview_generator(_preview_generator)
 	_preview_generator = null
@@ -263,6 +331,13 @@ func _exit_tree():
 	remove_custom_type("HTerrain")
 	remove_custom_type("HTerrainDetailLayer")
 	remove_custom_type("HTerrainData")
+	remove_custom_type("HTerrainTextureSet")
+	
+	remove_import_plugin(_packed_texture_importer)
+	_packed_texture_importer = null
+	
+	remove_import_plugin(_packed_texture_array_importer)
+	_packed_texture_array_importer = null
 
 
 func handles(object):
@@ -287,6 +362,7 @@ func edit(object):
 	_panel.set_terrain(_node)
 	_generator_dialog.set_terrain(_node)
 	_import_dialog.set_terrain(_node)
+	_brush.set_terrain(_node)
 	_brush_decal.set_terrain(_node)
 	_generate_mesh_dialog.set_terrain(_node)
 	_resize_dialog.set_terrain(_node)
@@ -294,7 +370,8 @@ func edit(object):
 	
 	if object is HTerrainDetailLayer:
 		# Auto-select layer for painting
-		_panel.set_detail_layer_index(object.get_layer_index())
+		if object.is_layer_index_valid():
+			_panel.set_detail_layer_index(object.get_layer_index())
 		_on_detail_selected(object.get_layer_index())
 	
 	_update_toolbar_menu_availability()
@@ -324,12 +401,12 @@ func _update_brush_buttons_availability():
 		else:
 			var button = _toolbar_brush_buttons[Brush.MODE_DETAIL]
 			if button.pressed:
-				_select_brush_mode(Brush.MODE_ADD)
+				_select_brush_mode(Brush.MODE_RAISE)
 			button.disabled = true
 
 
 func _update_toolbar_menu_availability():
-	var data_available = false
+	var data_available := false
 	if _node != null and _node.get_data() != null:
 		data_available = true
 	var popup : PopupMenu = _menu_button.get_popup()
@@ -344,7 +421,7 @@ func _update_toolbar_menu_availability():
 			popup.set_item_tooltip(i, "Terrain has no data")
 
 
-func make_visible(visible):
+func make_visible(visible: bool):
 	_panel.set_visible(visible)
 	_toolbar.set_visible(visible)
 	_brush_decal.update_visibility()
@@ -352,8 +429,25 @@ func make_visible(visible):
 	# TODO Workaround https://github.com/godotengine/godot/issues/6459
 	# When the user selects another node,
 	# I want the plugin to release its references to the terrain.
+	# This is important because if we don't do that, some modified resources will still be
+	# loaded in memory, so if the user closes the scene and reopens it later, the changes will
+	# still be partially present, and this is not expected.
 	if not visible:
 		edit(null)
+
+
+# TODO Can't hint return as `Vector2?` because it's nullable
+func _get_pointed_cell_position(mouse_position: Vector2, p_camera: Camera):# -> Vector2:
+	# Need to do an extra conversion in case the editor viewport is in half-resolution mode
+	var viewport = p_camera.get_viewport()
+	var viewport_container = viewport.get_parent()
+	var screen_pos = mouse_position * viewport.size / viewport_container.rect_size
+	
+	var origin = p_camera.project_ray_origin(screen_pos)
+	var dir = p_camera.project_ray_normal(screen_pos)
+
+	var ray_distance := p_camera.far * 1.2
+	return _node.cell_raycast(origin, dir, ray_distance)
 
 
 func forward_spatial_gui_input(p_camera: Camera, p_event: InputEvent) -> bool:
@@ -382,35 +476,28 @@ func forward_spatial_gui_input(p_camera: Camera, p_event: InputEvent) -> bool:
 				
 				if not _mouse_pressed:
 					# Just finished painting
-					_pending_paint_completed = true
+					_pending_paint_commit = true
+		
+			if _brush.get_mode() == Brush.MODE_FLATTEN and _brush.has_meta("pick_height") \
+			and _brush.get_meta("pick_height"):
+				_brush.set_meta("pick_height", false)
+				# Pick height
+				var hit_pos_in_cells = _get_pointed_cell_position(mb.position, p_camera)
+				if hit_pos_in_cells != null:
+					var h = _node.get_data().get_height_at(
+						int(hit_pos_in_cells.x), int(hit_pos_in_cells.y))
+					_logger.debug("Picking height {0}".format([h]))
+					_brush.set_flatten_height(h)
 
 	elif p_event is InputEventMouseMotion:
 		var mm = p_event
-		
-		# Need to do an extra conversion in case the editor viewport is in half-resolution mode
-		var viewport = p_camera.get_viewport()
-		var viewport_container = viewport.get_parent()
-		var screen_pos = mm.position * viewport.size / viewport_container.rect_size
-		
-		var origin = p_camera.project_ray_origin(screen_pos)
-		var dir = p_camera.project_ray_normal(screen_pos)
-
-		var ray_distance := p_camera.far * 1.2
-		var hit_pos_in_cells = _node.cell_raycast(origin, dir, ray_distance)
+		var hit_pos_in_cells = _get_pointed_cell_position(mm.position, p_camera)
 		if hit_pos_in_cells != null:
 			_brush_decal.set_position(Vector3(hit_pos_in_cells.x, 0, hit_pos_in_cells.y))
 			
 			if _mouse_pressed:
 				if Input.is_mouse_button_pressed(BUTTON_LEFT):
-					
-					# Deferring this to be done once per frame,
-					# because mouse events may happen more often than frames,
-					# which can result in unpleasant stuttering/freezes when painting large areas
-					_pending_paint_action = [
-						int(hit_pos_in_cells.x),
-						int(hit_pos_in_cells.y)
-					]
-					
+					_brush.paint_input(hit_pos_in_cells)
 					captured_event = true
 
 		# This is in case the data or textures change as the user edits the terrain,
@@ -420,69 +507,98 @@ func forward_spatial_gui_input(p_camera: Camera, p_event: InputEvent) -> bool:
 	return captured_event
 
 
-func _process(delta):
-	var has_data = false
-	
-	if _node != null:
-		if _pending_paint_action != null:
-			var override_mode = -1
-			_brush.paint(_node, _pending_paint_action[0], _pending_paint_action[1], override_mode)
+func _process(delta: float):
+	if _node == null:
+		return
 
-		if _pending_paint_completed:
-			_paint_completed()
-		
-		has_data = (_node.get_data() != null)
+	var has_data = (_node.get_data() != null)
+	
+	if _pending_paint_commit:
+		if has_data:
+			if _brush.has_modified_chunks() and not _brush.is_operation_pending():
+				_pending_paint_commit = false
+				_logger.debug("Paint completed")
+				var changes : Dictionary = _brush.commit()
+				_paint_completed(changes)
+		else:
+			_pending_paint_commit = false
 	
 	# Poll presence of data resource
 	if has_data != _terrain_had_data_previous_frame:
 		_terrain_had_data_previous_frame = has_data
 		_update_toolbar_menu_availability()
 
-	_pending_paint_completed = false
-	_pending_paint_action = null
 
+func _paint_completed(changes: Dictionary):
+	var time_before = OS.get_ticks_msec()
 
-func _paint_completed():
 	var heightmap_data = _node.get_data()
 	assert(heightmap_data != null)
 	
-	if not _brush._edit_has_undo_data():
-		# Painted nothing
-		return
+	var chunk_positions : Array = changes.chunk_positions
+	var changed_maps : Array = changes.maps
 	
-	var ur_data = _brush._edit_pop_undo_redo_data(heightmap_data)
-	var ur = get_undo_redo()
-	
-	var action_name := "Modify HeightMapData "
-	for i in len(ur_data.undo):
-		var map_info = ur_data.undo[i]
-		var map_debug_name = HTerrainData.get_map_debug_name(map_info.map_type, map_info.map_index)
+	var action_name := "Modify HTerrainData "
+	for i in len(changed_maps):
+		var mm = changed_maps[i]
+		var map_debug_name := HTerrainData.get_map_debug_name(mm.map_type, mm.map_index)
 		if i > 0:
 			action_name += " and "
 		action_name += map_debug_name
+
+	var redo_maps := []
+	var undo_maps := []
+	var chunk_size := _brush.get_undo_chunk_size()
 	
-	# Cache images to disk so RAM does not continuously go up (or at least much slower)
-	for maps_info in [ur_data.undo, ur_data.redo]:
-		for map_info in maps_info:
-			var chunk_list : Array = map_info.chunks
-			for i in len(chunk_list):
-				var im: Image = chunk_list[i]
-				chunk_list[i] = _image_cache.save_image(im)
+	for map in changed_maps:
+		# Cache images to disk so RAM does not continuously go up (or at least much slower)
+		for chunks in [map.chunk_initial_datas, map.chunk_final_datas]:
+			for i in len(chunks):
+				var im : Image = chunks[i]
+				chunks[i] = _image_cache.save_image(im)
+		
+		redo_maps.append({
+			"map_type": map.map_type,
+			"map_index": map.map_index,
+			"chunks": map.chunk_final_datas
+		})
+		undo_maps.append({
+			"map_type": map.map_type,
+			"map_index": map.map_index,
+			"chunks": map.chunk_initial_datas
+		})
 	
 	var undo_data := {
-		"chunk_positions": ur_data.chunk_positions,
-		"data": ur_data.redo,
-		"chunk_size": ur_data.chunk_size
+		"chunk_positions": chunk_positions,
+		"chunk_size": chunk_size,
+		"maps": undo_maps
 	}
 	var redo_data := {
-		"chunk_positions": ur_data.chunk_positions,
-		"data": ur_data.undo,
-		"chunk_size": ur_data.chunk_size
+		"chunk_positions": chunk_positions,
+		"chunk_size": chunk_size,
+		"maps": redo_maps
 	}
+	
+#	{
+#		chunk_positions: [Vector2, Vector2, ...]
+#		chunk_size: int
+#		maps: [
+#			{
+#				map_type: int
+#				map_index: int
+#				chunks: [
+#					int, int, ...
+#				]
+#			},
+#			...
+#		]
+#	}
+
+	var ur := get_undo_redo()
 
 	ur.create_action(action_name)
-	ur.add_do_method(heightmap_data, "_edit_apply_undo", undo_data, _image_cache)
-	ur.add_undo_method(heightmap_data, "_edit_apply_undo", redo_data, _image_cache)
+	ur.add_do_method(heightmap_data, "_edit_apply_undo", redo_data, _image_cache)
+	ur.add_undo_method(heightmap_data, "_edit_apply_undo", undo_data, _image_cache)
 
 	# Small hack here:
 	# commit_actions executes the do method, however terrain modifications are heavy ones,
@@ -493,7 +609,8 @@ func _paint_completed():
 	ur.commit_action()
 	heightmap_data._edit_set_disable_apply_undo(false)
 	
-	_logger.debug(action_name)
+	var time_spent = OS.get_ticks_msec() - time_before
+	_logger.debug(str(action_name, " | ", len(chunk_positions), " chunks | ", time_spent, " ms"))
 
 
 func _terrain_exited_scene():
@@ -501,7 +618,7 @@ func _terrain_exited_scene():
 	edit(null)
 
 
-func _menu_item_selected(id):
+func _menu_item_selected(id: int):
 	_logger.debug(str("Menu item selected ", id))
 	
 	match id:
@@ -545,6 +662,50 @@ func _menu_item_selected(id):
 		MENU_EXPORT_HEIGHTMAP:
 			if _node != null and _node.get_data() != null:
 				_export_image_dialog.popup_centered()
+		
+		MENU_LOOKDEV:
+			# No actions here, it's a submenu
+			pass
+
+		MENU_DOCUMENTATION:
+			OS.shell_open(DOCUMENTATION_URL)
+		
+		MENU_ABOUT:
+			_about_dialog.popup_centered()
+
+
+func _on_lookdev_menu_about_to_show():
+	_lookdev_menu.clear()
+	_lookdev_menu.add_check_item("Disabled")
+	_lookdev_menu.set_item_checked(0, not _node.is_lookdev_enabled())
+	_lookdev_menu.add_separator()
+	var terrain_data : HTerrainData = _node.get_data()
+	if terrain_data == null:
+		_lookdev_menu.add_item("No terrain data")
+		_lookdev_menu.set_item_disabled(0, true)
+	else:
+		for map_type in HTerrainData.CHANNEL_COUNT:
+			var count := terrain_data.get_map_count(map_type)
+			for map_index in count:
+				var map_name := HTerrainData.get_map_debug_name(map_type, map_index)
+				var lookdev_item_index := _lookdev_menu.get_item_count()
+				_lookdev_menu.add_item(map_name, lookdev_item_index)
+				_lookdev_menu.set_item_metadata(lookdev_item_index, {
+					"map_type": map_type,
+					"map_index": map_index
+				})
+
+
+func _on_lookdev_menu_id_pressed(id: int):
+	var meta = _lookdev_menu.get_item_metadata(id)
+	if meta == null:
+		_node.set_lookdev_enabled(false)
+	else:
+		_node.set_lookdev_enabled(true)
+		var data : HTerrainData = _node.get_data()
+		var map_texture = data.get_texture(meta.map_type, meta.map_index)
+		_node.set_lookdev_shader_param("u_map", map_texture)
+	_lookdev_menu.set_item_checked(0, not _node.is_lookdev_enabled())
 
 
 func _on_mode_selected(mode: int):
@@ -575,7 +736,7 @@ static func get_size_from_raw_length(flen: int):
 	return int(side_len)
 
 
-func _terrain_progress_notified(info):
+func _terrain_progress_notified(info: Dictionary):
 	if info.has("finished") and info.finished:
 		_progress_window.hide()
 	
@@ -619,6 +780,31 @@ func _on_permanent_change_performed(message: String):
 	ur.add_do_method(data, "_dummy_function")
 	#ur.add_undo_method(data, "_dummy_function")
 	ur.commit_action()
+
+
+func _on_brush_changed():
+	_brush_decal.set_size(_brush.get_brush_size())
+
+
+func _on_Panel_edit_texture_pressed(index: int):
+	var ts := _node.get_texture_set()
+	_texture_set_editor.set_texture_set(ts)
+	_texture_set_editor.select_slot(index)
+	_texture_set_editor.popup_centered()
+
+
+func _on_TextureSetEditor_import_selected():
+	_open_texture_set_import_editor()
+
+
+func _on_Panel_import_textures_pressed():
+	_open_texture_set_import_editor()
+
+
+func _open_texture_set_import_editor():
+	var ts := _node.get_texture_set()
+	_texture_set_import_editor.set_texture_set(ts)
+	_texture_set_import_editor.popup_centered()
 
 
 ################
