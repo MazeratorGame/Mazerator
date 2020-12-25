@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - stable
+      
+name: stable
 
 jobs:
   # job id, can be anything

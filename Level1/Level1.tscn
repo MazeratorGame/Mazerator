@@ -40,4 +40,4 @@ shader_params/u_triplanar = false
 shader_params/u_tile_reduction = Plane( 0, 0, 0, 0 )
 
 [node name="Player" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5.60608, 40.3111, -44.5806 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -56.4653, 66.6823, -75.4979 )
