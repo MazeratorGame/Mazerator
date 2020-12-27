@@ -13,9 +13,6 @@ textures = [ [ null, null, null, null ], [ null, null, null, null ] ]
 
 [node name="Spatial" type="Spatial"]
 
-[node name="Camera" type="Camera" parent="."]
-current = true
-
 [node name="Level 1" parent="." instance=ExtResource( 1 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.82238, 0.546833, -5.74112 )
 
@@ -40,4 +37,4 @@ shader_params/u_triplanar = false
 shader_params/u_tile_reduction = Plane( 0, 0, 0, 0 )
 
 [node name="Player" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -56.4653, 66.6823, -75.4979 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -14.476, 12.7957, -41.8885 )
