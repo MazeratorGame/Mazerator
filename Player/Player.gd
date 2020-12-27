@@ -11,14 +11,15 @@ var vertical_velocity = 0
 var gravity = 20
 
 var movement_speed = 0
-var walk_speed = 1.5
+var walk_speed = 3
 var run_speed = 5
 var acceleration = 6
 var angular_acceleration = 7
 
 var roll_magnitude = 17
 
-var JumpHeight = 5
+var jump_speed = 10
+var jump = false
 
 func _ready():
 	direction = Vector3.BACK.rotated(Vector3.UP, $Camroot/h.global_transform.basis.get_euler().y)
@@ -40,6 +41,10 @@ func _input(event):
 				$AnimationTree.set("parameters/roll/active", true)
 				$AnimationTree.set("parameters/aim_transition/current", 1)
 				$roll_timer.start()
+	
+	jump = false
+	if Input.is_action_just_pressed("jump"):
+		jump = true
 
 func _physics_process(delta):
 	
@@ -53,7 +58,6 @@ func _physics_process(delta):
 			$AnimationTree.set("parameters/aim_transition/current", 0)
 	else:
 		$AnimationTree.set("parameters/aim_transition/current", 1)
-	
 	
 	var h_rot = $Camroot/h.global_transform.basis.get_euler().y
 	
@@ -116,10 +120,11 @@ func _physics_process(delta):
 	
 	aim_turn = 0
 	
+	if jump and is_on_floor():
+		velocity.y = jump_speed
+	
 	
 #	$Status/Label.text = "direction : " + String(direction)
 #	$Status/Label2.text = "direction.length() : " + String(direction.length())
 #	$Status/Label3.text = "velocity : " + String(velocity)
 #	$Status/Label4.text = "velocity.length() : " + String(velocity.length())
-
-

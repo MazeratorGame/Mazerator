@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=2]
+[gd_scene load_steps=39 format=2]
 
 [ext_resource path="res://Player/Godot_Chan_Stealth.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player/Camera.gd" type="Script" id=2]
@@ -14,6 +14,7 @@
 [ext_resource path="res://Animations/walk_back_left-loop.tres" type="Animation" id=12]
 [ext_resource path="res://Animations/walk_back_right-loop.tres" type="Animation" id=13]
 [ext_resource path="res://Animations/walk_backward-loop.tres" type="Animation" id=14]
+[ext_resource path="res://Animations/Playerjump.tres" type="Animation" id=15]
 
 [sub_resource type="CylinderShape" id=1]
 radius = 0.42385
@@ -125,7 +126,7 @@ nodes/strafe/node = SubResource( 21 )
 nodes/strafe/position = Vector2( 0, 120 )
 nodes/walk_scale/node = SubResource( 22 )
 nodes/walk_scale/position = Vector2( 100, 400 )
-node_connections = [ "output", 0, "roll", "roll", 0, "aim_transition", "roll", 1, "roll_scale", "walk_scale", 0, "Animation 2", "iwr_blend", 0, "Animation", "iwr_blend", 1, "walk_scale", "iwr_blend", 2, "run_scale", "run_scale", 0, "Animation 3", "TimeScale", 0, "strafe", "aim_transition", 0, "TimeScale", "aim_transition", 1, "iwr_blend", "roll_scale", 0, "Animation 4" ]
+node_connections = [ "output", 0, "roll", "TimeScale", 0, "strafe", "aim_transition", 0, "TimeScale", "aim_transition", 1, "iwr_blend", "iwr_blend", 0, "Animation", "iwr_blend", 1, "walk_scale", "iwr_blend", 2, "run_scale", "run_scale", 0, "Animation 3", "walk_scale", 0, "Animation 2", "roll_scale", 0, "Animation 4", "roll", 0, "aim_transition", "roll", 1, "roll_scale" ]
 
 [node name="Player" type="KinematicBody"]
 script = ExtResource( 3 )
@@ -168,6 +169,7 @@ process_mode = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 root_node = NodePath("../Mesh/Godot_Chan_Stealth")
+anims/Playerjump = ExtResource( 15 )
 anims/idle-loop = ExtResource( 6 )
 anims/roll = ExtResource( 10 )
 anims/run_forward-loop = ExtResource( 11 )
