@@ -18,6 +18,8 @@ var angular_acceleration = 7
 
 var roll_magnitude = 17
 
+var JumpHeight = 5
+
 func _ready():
 	direction = Vector3.BACK.rotated(Vector3.UP, $Camroot/h.global_transform.basis.get_euler().y)
 	# Sometimes in the level design you might need to rotate the Player object itself
