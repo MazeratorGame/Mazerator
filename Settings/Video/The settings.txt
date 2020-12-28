@@ -1,0 +1,10 @@
+Nearest Mipmap filter: On or off
+MSAA: off, 2x, 4x, 8x, 16x
+Directional Shadow Size: Text Box
+Shadow Atlas Size: Text Box
+Subsurface Scattering quality: Low, medium and high
+Follow Surface: On or off
+HD reflections: On or off
+HDR: On or off
+Font Oversampling: On or off
+Screen resolution: 2 Text boxes
