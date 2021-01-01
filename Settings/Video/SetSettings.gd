@@ -87,6 +87,7 @@ func _on_Video_Settings_ready():
 		$Button2.text = "MSAA: 16x"
 	
 	$TextEdit.text = str(dss)
+	$TextEdit2.text = str(sas)
 
 
 func _on_TextEdit_text_changed():
@@ -96,4 +97,6 @@ func _on_TextEdit_text_changed():
 
 
 func _on_TextEdit2_text_changed():
-	pass # Replace with function body.
+	sas = int($TextEdit2.text)
+	config.set_value("sas", "size", 4096)
+	ProjectSettings.set_setting("rendering/quality/shadow_atlas/size", sas)
