@@ -16,6 +16,7 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/Awesome-Arcade/Mazerator)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/w/Awesome-Arcade/Mazerator)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Awesome-Arcade/Mazerator)
+[![gitlocalized ](https://gitlocalize.com/repo/5634/whole_project/badge.svg)](https://gitlocalize.com/repo/5634/whole_project?utm_source=badge)
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 
 
