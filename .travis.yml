@@ -1,0 +1,4 @@
+language: minimal
+script: ./travis-ci/run.sh
+
+before_script: chmod +x ./travis-ci/run.sh
