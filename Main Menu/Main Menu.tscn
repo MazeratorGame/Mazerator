@@ -16,8 +16,9 @@ __meta__ = {
 }
 
 [node name="Mazerator" type="Sprite" parent="."]
-position = Vector2( 512, 43 )
+position = Vector2( 638, 0 )
 texture = ExtResource( 1 )
+offset = Vector2( 0.230286, 43.0863 )
 
 [node name="Control" type="Control" parent="."]
 anchor_left = 0.5
@@ -37,10 +38,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -79.0
-margin_top = -49.0
-margin_right = 79.0
-margin_bottom = 22.0
+margin_left = -85.5
+margin_top = -75.5
+margin_right = 85.5
+margin_bottom = -4.5
 size_flags_stretch_ratio = 0.0
 theme = ExtResource( 4 )
 custom_fonts/font = ExtResource( 2 )
@@ -58,10 +59,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -78.5
-margin_top = 45.5
-margin_right = 78.5
-margin_bottom = 116.5
+margin_left = -86.5
+margin_top = 4.5
+margin_right = 86.5
+margin_bottom = 75.5
 theme = ExtResource( 4 )
 custom_fonts/font = ExtResource( 2 )
 custom_colors/font_color = Color( 0.54902, 0.12549, 0.184314, 1 )
