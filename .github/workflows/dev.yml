@@ -36,6 +36,6 @@ jobs:
     -  uses: actions/upload-artifact@v2
        with:
         name: mazerator
-        path: /home/runner/.local/share/godot/dist/
+        path: /home/runner/work/Mazerator/Mazerator/builds/*
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
