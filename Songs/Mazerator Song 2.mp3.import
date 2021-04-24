@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Mazerator Song 2.mp3-7985673fcf7de4ff7a47d334cbae4f6e.mp3str"
+
+[deps]
+
+source_file="res://Songs/Mazerator Song 2.mp3"
+dest_files=[ "res://.import/Mazerator Song 2.mp3-7985673fcf7de4ff7a47d334cbae4f6e.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0

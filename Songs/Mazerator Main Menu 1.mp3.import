@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Mazerator Main Menu 1.mp3-1711bb1435a1494050dc095bc8677f2b.mp3str"
+
+[deps]
+
+source_file="res://Songs/Mazerator Main Menu 1.mp3"
+dest_files=[ "res://.import/Mazerator Main Menu 1.mp3-1711bb1435a1494050dc095bc8677f2b.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
