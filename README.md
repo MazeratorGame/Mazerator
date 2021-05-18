@@ -4,7 +4,6 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Awesome-Arcade/Mazerator)
 ![Lines of code](https://img.shields.io/tokei/lines/github/MazeratorGame/Mazerator)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Awesome-Arcade/Mazerator/dev)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Awesome-Arcade/Mazerator/stable)
 ![CircleCI](https://img.shields.io/circleci/build/github/MazeratorGame/Mazerator)
 ![GitHub language count](https://img.shields.io/github/languages/count/Awesome-Arcade/Mazerator)
 ![GitHub top language](https://img.shields.io/github/languages/top/Awesome-Arcade/Mazerator)
