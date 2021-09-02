@@ -29,3 +29,6 @@ Open Godot 3.3 (must be this!) then open this project and then goto Project > Ex
 
 # Releases page
 Please note that releases on the release page aren't full releases! Full releases will have f at the end!!!
+
+# Donate!
+To donate either use the funding/sponsors section or go to [https://commerce.coinbase.com/checkout/766db0f0-8969-47b0-ab97-fbc6beda44dd](https://commerce.coinbase.com/checkout/766db0f0-8969-47b0-ab97-fbc6beda44dd)
