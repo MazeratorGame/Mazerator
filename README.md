@@ -32,3 +32,27 @@ Please note that releases on the release page aren't full releases! Full release
 
 # Donate!
 To donate either use the funding/sponsors section or go to [https://commerce.coinbase.com/checkout/766db0f0-8969-47b0-ab97-fbc6beda44dd](https://commerce.coinbase.com/checkout/766db0f0-8969-47b0-ab97-fbc6beda44dd)
+
+You can also directly donate to me at the following crypto addresses:
+Bitcoin: bc1q322ch40lqj33fv4p2k9v65mah6wukhz8yjmmfw
+Ethereum: 0x500df13CF0EB8aF05035CC3DdA0e64130DA2b755
+Cardano: addr1q87tr6z3j5avj8k45wm8z609n3tsx3mlqjnk8arn705ejehuk859r9f6ey0dtgakw957t8zhqdrh7p98v0688ulfn9nqgqn5vq
+Binance Coin on Binance Chain Network: bnb1657p6svdez6s62g6hrn903s9ju6hqvph753n75
+Tether on Ethereum: 0x500df13CF0EB8aF05035CC3DdA0e64130DA2b755
+XRP: rKy2uy2fDVBqEHcBS2zuramPdqaL7Xk54x
+USD Coin on Ethereum: 0x500df13CF0EB8aF05035CC3DdA0e64130DA2b755
+Polkadot: 16773Bb9dgC2C8rueXyZqmUqSo3thHEfBBQQFnMGioSMSANU
+Uniswap: 0x500df13CF0EB8aF05035CC3DdA0e64130DA2b755
+Chainlink: 0x500df13CF0EB8aF05035CC3DdA0e64130DA2b755
+Litecoin: LNnEqbG5RHYJEWZB8fCJG7hDHVcR5cn3YC
+Bitcoin Cash: qzejd8pcfzz435mkt78jhvra4nqus8d44qvlg0er39
+Cosmos: cosmos1rmctpc9qvsjvc9fr3w5u98dm3tclhnppjsyzh2
+Stellar: GAMFDMLLD7L5IX7ZZKOY2NYS37XOEZS4NWWKZFIDI57UXFFGAJ3FNK6G
+VeChain: 0x7F4da80687505bd9f2CE903A5a0a9134c3e49eB0
+Tron: TRKTBWqapzqRWGfww2WVWGC3R6G3GCjo3L
+Dai: 0x500df13CF0EB8aF05035CC3DdA0e64130DA2b755
+Tezos: tz1W8LDfib6FZ2V9tU31Jq9NArEVANkTArhz
+NEO: AcZHapSv9bCYiQ6dk8n9WMxhsv8LwhU8Z6
+NEM: NAPBLJT7XSC7GWHS2VOXLOTCZV7UJVHKRRR5RFCV
+Dogecoin: DTb5ptM4Ek32ZWfT98RdcarUNz1ezQQnpj
+Monero: 43vvVaF4FqHedNC5Y5RxVoTFhvKSC842Yd4nhDbSVtT8PqWdXhhyqzidJu6m3qT12h9juGVQkSzuNQusueHot1hB7uS2TR1
