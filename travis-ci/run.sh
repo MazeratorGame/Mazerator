@@ -13,6 +13,6 @@ mkdir win64
 zip win64.zip win64/*
 ./godot --export macos --path project.godot "Mazerator-mac"
 mv Mazerator-mac Mazerator-mac.zip
-mkdir win32
-./godot --export win32 --path project.godot "win32/Mazerator.exe"
-zip win32.zip win32/*
+mkdir linux64
+./godot --export linux64 --path project.godot "linux64/Mazerator.exe"
+zip linux64.zip linux64/*

@@ -7,3 +7,9 @@
 # Mono-specific ignores
 .mono/
 data_*/
+
+# stuff that gets uploaded to the site
+torrents/*
+
+# install scripts (not yet ready for pushing"
+InstallScripts/*

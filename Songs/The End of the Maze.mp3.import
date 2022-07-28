@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/The End of the Maze.mp3-cf142d5bbdfb1db6f9b8dd2684c4d889.mp3str"
+
+[deps]
+
+source_file="res://Songs/The End of the Maze.mp3"
+dest_files=[ "res://.import/The End of the Maze.mp3-cf142d5bbdfb1db6f9b8dd2684c4d889.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
