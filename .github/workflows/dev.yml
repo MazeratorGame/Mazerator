@@ -39,10 +39,18 @@ jobs:
         godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/3.3/Godot_v3.3-stable_export_templates.tpz
         relative_project_path: ./
         wine_path: ${{ steps.wine_install.outputs.WINE_PATH }}
-    -  uses: actions/upload-artifact@v2
+    -  uses: actions/upload-artifact@v3.1.0
        with:
-        name: mazerator
-        path: /home/runner/.local/share/godot/builds/
+        name: mazerator-linux64
+        path: /home/runner/.local/share/godot/builds/linux64
+    -  uses: actions/upload-artifact@v3.1.0
+       with:
+        name: mazerator-mac
+        path: /home/runner/.local/share/godot/builds/macos/intelMac.zip
+    -  uses: actions/upload-artifact@v3.1.0
+       with:
+        name: mazerator-win64
+        path: /home/runner/.local/share/godot/builds/win64
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   create_inno_and_make_release:
