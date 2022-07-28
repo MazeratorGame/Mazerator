@@ -53,10 +53,10 @@ jobs:
         path: /home/runner/.local/share/godot/builds/win64
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  create_inno_and_make_release:
+  create_inno:
     needs: export_game
     runs-on: windows-latest
-    name: Create Inno Setup Installers and Upload to Releases
+    name: Create Inno Setup Installers
     steps:
     - name: Install Inno Setup
       id: install_inno
@@ -64,3 +64,14 @@ jobs:
         Invoke-WebRequest https://files.jrsoftware.org/is/6/innosetup-6.2.0.exe -OutFile inno.exe
         dir
         D:\a\Mazerator\Mazerator\inno.exe /SILENT
+    - name: Download win64 build from previous job
+      id: download_win64
+      uses: actions/download-artifact@v3
+      with:
+        name: mazerator-win64
+    - name: Extract zip file into folder
+      id: extract
+      run: |
+        New-Item win64 -Type Directory
+        Set-Location win64
+        Expand-Archive -Path '../mazerator-win64.zip'
