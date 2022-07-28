@@ -75,6 +75,6 @@ jobs:
         New-Item win64 -Type Directory
         Move-Item -Path hterrain_native.dll -Destination win64/hterrain_native.dll
         Move-Item -Path win64.exe -Destination win64/win64.exe
-        dir %localappdata%/Programs
+        dir C:/Users/
         dir "C:/Program Files"
         dir "C:/Program Files (x86)"
