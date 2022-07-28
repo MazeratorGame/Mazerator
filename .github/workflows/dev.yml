@@ -55,4 +55,3 @@ jobs:
       run: |
         Invoke-WebRequest https://files.jrsoftware.org/is/6/innosetup-6.2.0.exe -OutFile inno.exe
         dir
-        inno.exe /SILENT
