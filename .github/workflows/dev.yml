@@ -73,5 +73,7 @@ jobs:
       id: extract
       run: |
         New-Item win64 -Type Directory
+        dir
         Set-Location win64
+        dir
         Expand-Archive -Path '../mazerator-win64.zip'
