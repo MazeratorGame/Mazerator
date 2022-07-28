@@ -53,4 +53,5 @@ jobs:
       id: install_inno
       run: |
         curl https://jrsoftware.org/download.php/is.exe --output inno.exe
+        dir/w
         inno.exe /SILENT
