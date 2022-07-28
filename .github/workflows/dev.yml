@@ -46,12 +46,13 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   create_inno_and_make_release:
+    needs: export_game
     runs-on: windows-latest
     name: Create Inno Setup Installers and Upload to Releases
     steps:
     - name: Install Inno Setup
       id: install_inno
       run: |
-        curl https://jrsoftware.org/download.php/is.exe --output inno.exe
-        dir/w
+        Invoke-WebRequest https://files.jrsoftware.org/is/6/innosetup-6.2.0.exe -OutFile inno.exe
+        dir
         inno.exe /SILENT
