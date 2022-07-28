@@ -69,11 +69,12 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: mazerator-win64
-    - name: Extract zip file into folder
+    - name: Move files into folder
       id: extract
       run: |
         New-Item win64 -Type Directory
-        dir
-        Set-Location win64
-        dir
-        Expand-Archive -Path '../mazerator-win64.zip'
+        Move-Item -Path hterrain_native.dll -Destination win64/hterrain_native.dll
+        Move-Item -Path win64.exe -Destination win64/win64.exe
+        dir %localappdata%/Programs
+        dir "C:/Program Files"
+        dir "C:/Program Files (x86)"
