@@ -66,7 +66,7 @@ jobs:
         D:\a\Mazerator\Mazerator\inno.exe /SILENT
     - name: Download win64 build from previous job
       id: download_win64
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: mazerator-win64
     - name: Move files into folder
